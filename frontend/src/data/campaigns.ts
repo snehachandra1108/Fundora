@@ -1,0 +1,40 @@
+import type { Campaign } from '../types/campaign'
+
+export const campaigns: Campaign[] = [
+  {
+    id: 1,
+    title: 'Education for Every Child',
+    description: 'Help children from underprivileged backgrounds access quality education and learning resources.',
+    category: 'Education',
+    goal: 100000,
+    amountRaised: 70000,
+    deadline: '2026-12-31',
+    image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b',
+    creatorName: 'Priya Sharma',
+    creatorId: 101,
+  },
+  {
+    id: 2,
+    title: 'Healthcare Support',
+    description: 'Provide essential medical support and treatment for families who cannot afford healthcare.',
+    category: 'Medical',
+    goal: 100000,
+    amountRaised: 45000,
+    deadline: '2026-12-20',
+    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d',
+    creatorName: 'Rahul Mehta',
+    creatorId: 102,
+  },
+  {
+    id: 3,
+    title: 'Green Earth Initiative',
+    description: 'Support tree plantation and environmental conservation initiatives in local communities.',
+    category: 'Environment',
+    goal: 100000,
+    amountRaised: 85000,
+    deadline: '2027-01-15',
+    image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e',
+    creatorName: 'Ananya Rao',
+    creatorId: 103,
+  },
+]

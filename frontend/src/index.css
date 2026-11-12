@@ -1,0 +1,41 @@
+
+/* Global styles for the entire application */
+
+:root {
+  font-family: Arial, sans-serif;
+  color: #25213b;
+  background-color: #ffffff;
+}
+
+/* Remove default browser spacing */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Basic body styling */
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Default button styling */
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Default link styling */
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+html {
+  scroll-behavior: smooth;
+}

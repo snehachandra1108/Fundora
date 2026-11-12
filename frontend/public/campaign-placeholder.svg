@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="100%" stop-color="#d1fae5"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <circle cx="400" cy="190" r="85" fill="#ffffff" opacity="0.8"/>
+  <path d="M400 250 C350 215 315 185 315 150 C315 105 375 90 400 135 C425 90 485 105 485 150 C485 185 450 215 400 250Z" fill="#0d9488"/>
+  <path d="M400 275 V345 M365 310 H435" stroke="#0d9488" stroke-width="12" stroke-linecap="round"/>
+  <text x="400" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="bold" fill="#164e63">Every contribution matters</text>
+</svg>
