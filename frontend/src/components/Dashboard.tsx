@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Campaign } from "../types/campaign";
@@ -28,6 +27,10 @@ interface ReceivedContribution {
 type DashboardTab = "supported" | "created";
 type CreatedTab = "received" | "campaigns";
 
+type ConfirmationAction =
+  | { type: "review"; contributionId: number; decision: "confirm" | "reject" }
+  | { type: "deleteCampaign"; campaignId: number };
+
 const ITEMS_PER_PAGE = 5;
 
 function Dashboard() {
@@ -48,9 +51,13 @@ function Dashboard() {
 
   const [selectedContributionId, setSelectedContributionId] = useState<number | null>(null);
   const [reviewingContributionId, setReviewingContributionId] = useState<number | null>(null);
+  const [deletingCampaignId, setDeletingCampaignId] = useState<number | null>(null);
+  const [confirmationAction, setConfirmationAction] = useState<ConfirmationAction | null>(null);
+  const [confirmationError, setConfirmationError] = useState("");
 
   const [reviewError, setReviewError] = useState("");
   const [reviewMessage, setReviewMessage] = useState("");
+  const [campaignActionMessage, setCampaignActionMessage] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [receivedCurrentPage, setReceivedCurrentPage] = useState(1);
@@ -221,15 +228,8 @@ function Dashboard() {
     contributionId: number,
     decision: "confirm" | "reject",
   ) {
-    const confirmed = window.confirm(
-      decision === "confirm"
-        ? "Have you verified that this payment was received in your UPI/bank account? Confirming will add this amount to the campaign total."
-        : "Are you sure you want to reject this contribution?",
-    );
-
-    if (!confirmed) return;
-
     setReviewingContributionId(contributionId);
+    setConfirmationError("");
     setReviewError("");
     setReviewMessage("");
 
@@ -252,6 +252,7 @@ function Dashboard() {
           ? "Contribution confirmed successfully."
           : "Contribution rejected successfully.",
       );
+      setConfirmationAction(null);
 
       await Promise.all([
         fetchContributions(),
@@ -260,17 +261,20 @@ function Dashboard() {
       ]);
     } catch (error) {
       console.error("Contribution review error:", error);
-      setReviewError(
-        error instanceof Error ? error.message : "Something went wrong while reviewing the contribution.",
-      );
+      const message = error instanceof Error
+        ? error.message
+        : "Something went wrong while reviewing the contribution.";
+      setReviewError(message);
+      setConfirmationError(message);
     } finally {
       setReviewingContributionId(null);
     }
   }
 
   async function handleDeleteCampaign(campaignId: number) {
-    const confirmed = window.confirm("Are you sure you want to delete this campaign?");
-    if (!confirmed) return;
+    setDeletingCampaignId(campaignId);
+    setConfirmationError("");
+    setCampaignActionMessage("");
 
     try {
       const response = await fetch(`http://localhost:5000/api/campaigns/${campaignId}`, {
@@ -284,11 +288,35 @@ function Dashboard() {
       setMyCampaigns((previous) =>
         previous.filter((campaign) => campaign.id !== campaignId),
       );
-
-      alert("Campaign deleted successfully!");
+      setCampaignActionMessage("Campaign deleted successfully.");
+      setConfirmationAction(null);
     } catch (error) {
       console.error("Campaign deletion error:", error);
-      alert(error instanceof Error ? error.message : "Something went wrong.");
+      const message = error instanceof Error ? error.message : "Something went wrong.";
+      setConfirmationError(message);
+    } finally {
+      setDeletingCampaignId(null);
+    }
+  }
+
+  function openConfirmation(action: ConfirmationAction) {
+    setConfirmationError("");
+    setReviewError("");
+    setReviewMessage("");
+    setCampaignActionMessage("");
+    setConfirmationAction(action);
+  }
+
+  function handleConfirmAction() {
+    if (!confirmationAction) return;
+
+    if (confirmationAction.type === "review") {
+      void handleReviewContribution(
+        confirmationAction.contributionId,
+        confirmationAction.decision,
+      );
+    } else {
+      void handleDeleteCampaign(confirmationAction.campaignId);
     }
   }
 
@@ -512,8 +540,13 @@ function Dashboard() {
                       <div className="contribution-review-actions">
                         <button
                           type="button"
+                          className="confirm-payment-button"
                           disabled={reviewingContributionId !== null || !contribution.utr_reference}
-                          onClick={() => handleReviewContribution(contribution.id, "confirm")}
+                          onClick={() => openConfirmation({
+                            type: "review",
+                            contributionId: contribution.id,
+                            decision: "confirm",
+                          })}
                         >
                           {reviewingContributionId === contribution.id ? "Processing..." : "Confirm Payment"}
                         </button>
@@ -522,7 +555,11 @@ function Dashboard() {
                           type="button"
                           className="delete-button"
                           disabled={reviewingContributionId !== null || !contribution.utr_reference}
-                          onClick={() => handleReviewContribution(contribution.id, "reject")}
+                          onClick={() => openConfirmation({
+                            type: "review",
+                            contributionId: contribution.id,
+                            decision: "reject",
+                          })}
                         >
                           Reject
                         </button>
@@ -556,6 +593,7 @@ function Dashboard() {
 
           {createdTab === "campaigns" && (
             <div className="dashboard-campaigns">
+              {campaignActionMessage && <p className="success-message">{campaignActionMessage}</p>}
               <div className="dashboard-campaigns-heading my-campaigns-heading">
                 <h2>My Campaigns</h2>
                 <Link to="/create-campaign" className="create-campaign-button">
@@ -599,7 +637,10 @@ function Dashboard() {
                       <button
                         type="button"
                         className="delete-button"
-                        onClick={() => handleDeleteCampaign(campaign.id)}
+                        onClick={() => openConfirmation({
+                          type: "deleteCampaign",
+                          campaignId: campaign.id,
+                        })}
                       >
                         Delete
                       </button>
@@ -630,6 +671,99 @@ function Dashboard() {
             </div>
           )}
         </>
+      )}
+
+      {confirmationAction && (
+        <div
+          className="confirmation-modal-backdrop"
+          onClick={() => {
+            if (reviewingContributionId === null && deletingCampaignId === null) {
+              setConfirmationAction(null);
+              setConfirmationError("");
+            }
+          }}
+        >
+          <div
+            className="confirmation-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirmation-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="confirmation-modal-header">
+              <div className={`confirmation-modal-icon ${confirmationAction.type === "review" && confirmationAction.decision === "confirm" ? "success" : "warning"}`}>
+                {confirmationAction.type === "deleteCampaign" || confirmationAction.type === "review" && confirmationAction.decision === "reject" ? "!" : "✓"}
+              </div>
+              <button
+                type="button"
+                className="confirmation-modal-close"
+                aria-label="Close confirmation dialog"
+                disabled={reviewingContributionId !== null || deletingCampaignId !== null}
+                onClick={() => {
+                  setConfirmationAction(null);
+                  setConfirmationError("");
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <h2 id="confirmation-modal-title">
+              {confirmationAction.type === "deleteCampaign"
+                ? "Delete campaign?"
+                : confirmationAction.decision === "confirm"
+                  ? "Confirm payment?"
+                  : "Reject contribution?"}
+            </h2>
+
+            {confirmationAction.type === "review" ? (
+              <>
+                <p className="confirmation-modal-amount">
+                  ₹{Number(receivedContributions.find((item) => item.id === confirmationAction.contributionId)?.amount ?? 0).toLocaleString("en-IN")}
+                </p>
+                <p>
+                  {confirmationAction.decision === "confirm"
+                    ? "Have you verified that this payment was received in your UPI or bank account? Once confirmed, this amount will be added to the campaign total."
+                    : "Are you sure you want to reject this contribution? The contribution will be marked as rejected."}
+                </p>
+              </>
+            ) : (
+              <p>
+                This will permanently delete “{myCampaigns.find((item) => item.id === confirmationAction.campaignId)?.title ?? "this campaign"}”. This action cannot be undone.
+              </p>
+            )}
+
+            {confirmationError && <p className="confirmation-modal-error">{confirmationError}</p>}
+
+            <div className="confirmation-modal-actions">
+              <button
+                type="button"
+                className="confirmation-cancel-button"
+                disabled={reviewingContributionId !== null || deletingCampaignId !== null}
+                onClick={() => {
+                  setConfirmationAction(null);
+                  setConfirmationError("");
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className={`confirmation-submit-button ${confirmationAction.type === "review" && confirmationAction.decision === "confirm" ? "primary" : "danger"}`}
+                disabled={reviewingContributionId !== null || deletingCampaignId !== null}
+                onClick={handleConfirmAction}
+              >
+                {reviewingContributionId !== null || deletingCampaignId !== null
+                  ? "Processing..."
+                  : confirmationAction.type === "deleteCampaign"
+                    ? "Delete Campaign"
+                    : confirmationAction.decision === "confirm"
+                      ? "Confirm Payment"
+                      : "Reject Contribution"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </section>
   );
