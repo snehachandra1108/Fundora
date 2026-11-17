@@ -66,12 +66,16 @@ function AdminDashboard() {
           credentials: "include",
         });
 
+        const responseBody = await response.text();
+
         if (!response.ok) {
+          alert(
+            "HTTP Status: " + response.status + "\nResponse: " + responseBody,
+          );
           throw new Error("Failed to fetch platform statistics.");
         }
 
-        const data = await response.json();
-
+        const data = JSON.parse(responseBody);
         alert(
           "Status: " + response.status + "\nResponse: " + JSON.stringify(data),
         );
