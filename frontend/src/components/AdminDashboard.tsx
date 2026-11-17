@@ -40,6 +40,13 @@ interface AdminContribution {
   campaign_title: string;
 }
 
+interface ContributionPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 function AdminDashboard() {
   const [pendingCampaigns, setPendingCampaigns] = useState<PendingCampaign[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,6 +61,16 @@ function AdminDashboard() {
   const [contributions, setContributions] = useState<AdminContribution[]>([]);
   const [contributionsLoading, setContributionsLoading] = useState(true);
   const [contributionsError, setContributionsError] = useState("");
+
+  const [contributionPage, setContributionPage] = useState(1);
+
+  const [contributionPagination, setContributionPagination] =
+    useState<ContributionPagination>({
+      page: 1,
+      limit: 10,
+      total: 0,
+      totalPages: 1,
+    });
 
   const { showNotification } = useNotification();
 
@@ -135,17 +152,24 @@ function AdminDashboard() {
 
   useEffect(() => {
     async function fetchContributions() {
+      setContributionsLoading(true);
+
       try {
-        const response = await fetch(`${API_URL}/api/admin/contributions`, {
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${API_URL}/api/admin/contributions?page=${contributionPage}`,
+          {
+            credentials: "include",
+          },
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch contributions.");
         }
 
         const data = await response.json();
+
         setContributions(data.contributions || []);
+        setContributionPagination(data.pagination);
         setContributionsError("");
       } catch (error) {
         console.error("Error fetching contributions:", error);
@@ -156,7 +180,7 @@ function AdminDashboard() {
     }
 
     fetchContributions();
-  }, []);
+  }, [contributionPage]);
 
   async function handleCampaignReview(
     campaignId: number,
@@ -200,6 +224,18 @@ function AdminDashboard() {
       );
     }
   }
+
+  const contributionStart =
+    contributionPagination.total === 0
+      ? 0
+      : (contributionPagination.page - 1) *
+          contributionPagination.limit +
+        1;
+
+  const contributionEnd = Math.min(
+    contributionPagination.page * contributionPagination.limit,
+    contributionPagination.total,
+  );
 
   return (
     <section className="dashboard-section">
@@ -301,35 +337,65 @@ function AdminDashboard() {
         ) : contributions.length === 0 ? (
           <p>No contributions have been made yet.</p>
         ) : (
-          contributions.map((contribution) => (
-            <div className="dashboard-campaign-item" key={contribution.id}>
-              <div>
-                <h3>{contribution.campaign_title}</h3>
-                <p>
-                  Contributor: {contribution.supporter_name}
-                </p>
-                <p>Email: {contribution.supporter_email}</p>
-                <p>
-                  Amount: ₹
-                  {Number(contribution.amount).toLocaleString("en-IN")}
-                </p>
-                <p>
-                  UTR Reference: {contribution.utr_reference || "Not submitted"}
-                </p>
-                <p>
-                  Date:{" "}
-                  {new Date(contribution.created_at).toLocaleString("en-IN")}
-                </p>
-              </div>
+          <>
+            {contributions.map((contribution) => (
+              <div className="dashboard-campaign-item" key={contribution.id}>
+                <div>
+                  <h3>{contribution.campaign_title}</h3>
+                  <p>Contributor: {contribution.supporter_name}</p>
+                  <p>Email: {contribution.supporter_email}</p>
+                  <p>
+                    Amount: ₹
+                    {Number(contribution.amount).toLocaleString("en-IN")}
+                  </p>
+                  <p>
+                    UTR Reference: {contribution.utr_reference || "Not submitted"}
+                  </p>
+                  <p>
+                    Date:{" "}
+                    {new Date(contribution.created_at).toLocaleString("en-IN")}
+                  </p>
+                </div>
 
-              <span
-                className={`campaign-status ${contribution.status}-status`}
+                <span
+                  className={`campaign-status ${contribution.status}-status`}
+                >
+                  {contribution.status.charAt(0).toUpperCase() +
+                    contribution.status.slice(1)}
+                </span>
+              </div>
+            ))}
+
+            {/* Contribution pagination */}
+            <div className="pagination">
+              <p>
+                Showing {contributionStart}–{contributionEnd} of{" "}
+                {contributionPagination.total} contributions
+              </p>
+
+              <button
+                onClick={() => setContributionPage((page) => page - 1)}
+                disabled={contributionPage === 1 || contributionsLoading}
               >
-                {contribution.status.charAt(0).toUpperCase() +
-                  contribution.status.slice(1)}
+                Previous
+              </button>
+
+              <span>
+                Page {contributionPagination.page} of{" "}
+                {contributionPagination.totalPages}
               </span>
+
+              <button
+                onClick={() => setContributionPage((page) => page + 1)}
+                disabled={
+                  contributionPage >= contributionPagination.totalPages ||
+                  contributionsLoading
+                }
+              >
+                Next
+              </button>
             </div>
-          ))
+          </>
         )}
       </div>
 
