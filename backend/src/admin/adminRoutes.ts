@@ -1,3 +1,4 @@
+
 import { Router } from "express";
 import { pool } from "../config/db.js";
 import { requireAuth, requireRole } from "../middleware/authMiddleware.js";
@@ -50,5 +51,43 @@ router.get("/users", requireAuth, requireRole("admin"), async (req, res) => {
     });
   }
 });
+
+// Get all contributions across Fundora (admin only)
+router.get(
+  "/contributions",
+  requireAuth,
+  requireRole("admin"),
+  async (req, res) => {
+    try {
+      const result = await pool.query(`
+        SELECT
+          contributions.id,
+          contributions.amount,
+          contributions.utr_reference,
+          contributions.status,
+          contributions.created_at,
+          users.name AS supporter_name,
+          users.email AS supporter_email,
+          campaigns.title AS campaign_title
+        FROM contributions
+        JOIN users
+          ON contributions.supporter_id = users.id
+        JOIN campaigns
+          ON contributions.campaign_id = campaigns.id
+        ORDER BY contributions.created_at DESC
+      `);
+
+      return res.json({
+        contributions: result.rows,
+      });
+    } catch (error) {
+      console.error("Error fetching all contributions:", error);
+
+      return res.status(500).json({
+        message: "Failed to fetch contributions.",
+      });
+    }
+  }
+);
 
 export default router;

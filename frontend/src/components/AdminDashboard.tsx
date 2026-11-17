@@ -29,6 +29,17 @@ interface RecentUser {
   created_at: string;
 }
 
+interface AdminContribution {
+  id: number;
+  amount: string | number;
+  utr_reference: string | null;
+  status: string;
+  created_at: string;
+  supporter_name: string;
+  supporter_email: string;
+  campaign_title: string;
+}
+
 function AdminDashboard() {
   const [pendingCampaigns, setPendingCampaigns] = useState<PendingCampaign[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,6 +50,10 @@ function AdminDashboard() {
 
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
+
+  const [contributions, setContributions] = useState<AdminContribution[]>([]);
+  const [contributionsLoading, setContributionsLoading] = useState(true);
+  const [contributionsError, setContributionsError] = useState("");
 
   const { showNotification } = useNotification();
 
@@ -116,6 +131,31 @@ function AdminDashboard() {
     }
 
     fetchRecentUsers();
+  }, []);
+
+  useEffect(() => {
+    async function fetchContributions() {
+      try {
+        const response = await fetch(`${API_URL}/api/admin/contributions`, {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch contributions.");
+        }
+
+        const data = await response.json();
+        setContributions(data.contributions || []);
+        setContributionsError("");
+      } catch (error) {
+        console.error("Error fetching contributions:", error);
+        setContributionsError("Unable to load contribution information.");
+      } finally {
+        setContributionsLoading(false);
+      }
+    }
+
+    fetchContributions();
   }, []);
 
   async function handleCampaignReview(
@@ -243,6 +283,51 @@ function AdminDashboard() {
                   Reject
                 </button>
               </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* All contributions */}
+      <div className="dashboard-campaigns admin-contributions">
+        <div className="dashboard-campaigns-heading">
+          <h2>All Contributions</h2>
+        </div>
+
+        {contributionsLoading ? (
+          <p>Loading contributions...</p>
+        ) : contributionsError ? (
+          <p>{contributionsError}</p>
+        ) : contributions.length === 0 ? (
+          <p>No contributions have been made yet.</p>
+        ) : (
+          contributions.map((contribution) => (
+            <div className="dashboard-campaign-item" key={contribution.id}>
+              <div>
+                <h3>{contribution.campaign_title}</h3>
+                <p>
+                  Contributor: {contribution.supporter_name}
+                </p>
+                <p>Email: {contribution.supporter_email}</p>
+                <p>
+                  Amount: ₹
+                  {Number(contribution.amount).toLocaleString("en-IN")}
+                </p>
+                <p>
+                  UTR Reference: {contribution.utr_reference || "Not submitted"}
+                </p>
+                <p>
+                  Date:{" "}
+                  {new Date(contribution.created_at).toLocaleString("en-IN")}
+                </p>
+              </div>
+
+              <span
+                className={`campaign-status ${contribution.status}-status`}
+              >
+                {contribution.status.charAt(0).toUpperCase() +
+                  contribution.status.slice(1)}
+              </span>
             </div>
           ))
         )}
