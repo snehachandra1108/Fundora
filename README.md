@@ -1,4 +1,4 @@
-# Fundora — Crowdfunding Platform
+# Fundora - A Crowdfunding Platform
 
 Fundora is a full-stack crowdfunding platform that brings ideas to life by connecting campaign creators with people who believe in their causes. Users can launch campaigns, discover initiatives, and contribute through a simple UPI-based system.
 
@@ -161,23 +161,85 @@ npm run dev
 The frontend will be available at `http://localhost:5173` and the backend at `http://localhost:5000`.
 
 ---
-## Live Demo
 
-**Live Application:** https://fundora-chi.vercel.app/
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/homepage.png" width="100%" alt="Fundora Homepage">
+      <h3>Homepage</h3>
+      <p>Landing page of Fundora.</p>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/explore-campaigns.png" width="100%" alt="Explore Campaigns">
+      <h3>Explore Campaigns</h3>
+      <p>Browse publicly available campaigns.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/campaign-details.png" width="100%" alt="Campaign Details">
+      <h3>Campaign Details</h3>
+      <p>View campaign information and contribution options.</p>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/payment.png" width="100%" alt="Payments">
+      <h3>Payments</h3>
+      <p>View UPI payment information.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/create-campaign.png" width="100%" alt="Create Campaign">
+      <h3>Create Campaign</h3>
+      <p>Create a new fundraising campaign.</p>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/supported-campaigns.png" width="100%" alt="Supported Campaigns">
+      <h3>Supported Campaigns</h3>
+      <p>View campaigns you have contributed to.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/created-campaigns.png" width="100%" alt="Created Campaigns">
+      <h3>Created Campaigns</h3>
+      <p>Manage your campaigns and view contributions received.</p>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/admin-dashboard.png" width="100%" alt="Admin Dashboard">
+      <h3>Admin Dashboard</h3>
+      <p>Monitor platform statistics and manage campaigns and contributions.</p>
+    </td>
+  </tr>
+</table>
 
 ---
-##Screenshots
+
+## Highlights
+
+- Campaign approval workflow with automatic re-submission for review when approved campaigns are edited.
+- UPI-based contribution tracking with unique UTR validation.
+- Database consistency between successful contributions and campaign funding totals.
+- Secure session-based authentication and role-based access control.
+- Paginated contribution records for efficient data retrieval.
+
+---
+
+## Live Demo
+
+- **Frontend:** https://fundora-chi.vercel.app/
+- **Backend:** https://fundora-backend-2jqd.onrender.com
+
 ---
 
 ## Future Improvements
 
-- Automated contribution verification.
-- Enhanced campaign analytics.
-- Additional platform monitoring and reporting.
-
----
-
-## Author
-
-Developed as a full-stack portfolio project.
+- Strengthen signup validation with proper email verification and password requirements.
+- Integrate a secure payment gateway for automated payment processing.
+- Introduce email notifications for account verification, campaign updates, and contribution status.
+- Add campaign search, filtering, and sorting.
+- Implement automated unit and integration testing.
+- Introduce campaign analytics and visual funding insights.
 
