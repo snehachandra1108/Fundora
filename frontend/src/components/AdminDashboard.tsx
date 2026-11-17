@@ -1,4 +1,5 @@
 
+import { useNotification } from "../context/NotificationContext";
 import API_URL from "../config/api";
 import { useEffect, useState } from "react";
 
@@ -38,6 +39,8 @@ function AdminDashboard() {
 
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
+
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     async function fetchPendingCampaigns() {
@@ -142,14 +145,19 @@ function AdminDashboard() {
         previousCampaigns.filter((campaign) => campaign.id !== campaignId),
       );
 
-      alert(
+      showNotification(
         status === "approved"
           ? "Campaign approved successfully!"
           : "Campaign rejected successfully!",
+        "success",
       );
     } catch (error) {
       console.error("Campaign review error:", error);
-      alert(error instanceof Error ? error.message : "Something went wrong.");
+
+      showNotification(
+        error instanceof Error ? error.message : "Something went wrong.",
+        "error",
+      );
     }
   }
 

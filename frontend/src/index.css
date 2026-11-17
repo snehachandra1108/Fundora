@@ -39,3 +39,161 @@ a {
 html {
   scroll-behavior: smooth;
 }
+
+
+/* ================================
+   Fundora In-App Notifications
+================================ */
+
+.notification-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(380px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.app-notification {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #16a34a;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  animation: notification-slide-in 0.25s ease-out;
+}
+
+.app-notification p {
+  margin: 0;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.notification-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #15803d;
+  font-weight: 700;
+}
+
+.app-notification.error {
+  border-left-color: #dc2626;
+}
+
+.app-notification.error .notification-icon {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.app-notification.warning {
+  border-left-color: #d97706;
+}
+
+.app-notification.warning .notification-icon {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+@keyframes notification-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .notification-container {
+    top: 12px;
+    right: 12px;
+    width: calc(100vw - 24px);
+  }
+}
+
+
+/* Campaign confirmation dialog */
+
+.confirmation-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.confirmation-dialog {
+  width: 100%;
+  max-width: 420px;
+  padding: 28px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  animation: notification-slide-in 0.2s ease-out;
+}
+
+.confirmation-dialog h2 {
+  margin: 0 0 12px;
+  color: #1f2937;
+  font-size: 21px;
+}
+
+.confirmation-dialog p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.confirmation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.confirmation-actions button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.confirmation-cancel {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.confirmation-delete {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.confirmation-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+

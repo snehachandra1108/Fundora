@@ -1,5 +1,7 @@
+
 import { useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useNotification } from "../context/NotificationContext";
 import type { Campaign } from "../types/campaign";
 
 function CreateCampaign({
@@ -17,11 +19,15 @@ function CreateCampaign({
   onUpdate: (campaign: Campaign) => Promise<void>;
 }) {
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
   const { id } = useParams();
+
   const existingCampaign = campaigns.find(
     (campaign) => campaign.id === Number(id),
   );
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     title: existingCampaign?.title ?? "",
     description: existingCampaign?.description ?? "",
@@ -57,7 +63,10 @@ function CreateCampaign({
     event.preventDefault();
 
     if (!isDeadlineValid(formData.deadline)) {
-      alert("Campaign deadline must be a future date.");
+      showNotification(
+        "Campaign deadline must be a future date.",
+        "warning",
+      );
       return;
     }
 
@@ -77,7 +86,7 @@ function CreateCampaign({
 
         await onUpdate(updatedCampaign);
 
-        alert("Campaign updated successfully!");
+        showNotification("Campaign updated successfully!", "success");
       } else {
         await onCreate({
           title: formData.title,
@@ -88,17 +97,18 @@ function CreateCampaign({
           image: formData.image,
         });
 
-        alert("Campaign created successfully!");
+        showNotification("Campaign created successfully!", "success");
       }
 
       navigate("/");
     } catch (error) {
-      alert(
+      showNotification(
         error instanceof Error
           ? error.message
           : existingCampaign
             ? "Failed to update campaign."
             : "Failed to create campaign.",
+        "error",
       );
     } finally {
       setIsSubmitting(false);

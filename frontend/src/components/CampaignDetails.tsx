@@ -1,4 +1,5 @@
 
+import { useNotification } from "../context/NotificationContext";
 import type { User } from "../types/user";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -27,6 +28,7 @@ function CampaignDetails({
 }) {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { showNotification } = useNotification();
 
   const [campaign, setCampaign] = useState<Campaign | null>(null);
 
@@ -59,6 +61,8 @@ function CampaignDetails({
   const [contributionStatus, setContributionStatus] = useState<
     "pending" | "successful" | "failed" | null
   >(null);
+
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   // A separate retry key for each user and campaign.
   function getRetryKey() {
@@ -463,6 +467,31 @@ function CampaignDetails({
     }
   }
 
+  // Delete the campaign after the user confirms the action.
+  async function handleDeleteCampaign() {
+    if (!campaign) return;
+
+    try {
+      setDeletingCampaign(true);
+
+      await onDelete(campaign.id);
+
+      setShowDeleteConfirmation(false);
+      showNotification("Campaign deleted successfully!", "success");
+
+      navigate("/");
+    } catch (error) {
+      showNotification(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete campaign.",
+        "error",
+      );
+    } finally {
+      setDeletingCampaign(false);
+    }
+  }
+
   if (loading) {
     return (
       <section className="campaign-details">
@@ -796,27 +825,7 @@ function CampaignDetails({
               <button
                 className="delete-campaign-button"
                 disabled={deletingCampaign}
-                onClick={async () => {
-                  const confirmed = window.confirm(
-                    "Are you sure you want to delete this campaign? This action cannot be undone.",
-                  );
-
-                  if (!confirmed) return;
-
-                  try {
-                    setDeletingCampaign(true);
-                    await onDelete(campaign.id);
-                    navigate("/");
-                  } catch (error) {
-                    alert(
-                      error instanceof Error
-                        ? error.message
-                        : "Failed to delete campaign.",
-                    );
-                  } finally {
-                    setDeletingCampaign(false);
-                  }
-                }}
+                onClick={() => setShowDeleteConfirmation(true)}
               >
                 {deletingCampaign && <span className="loading-spinner" />}
                 {deletingCampaign ? "Deleting..." : "Delete Campaign"}
@@ -825,6 +834,46 @@ function CampaignDetails({
           )}
         </div>
       </div>
+
+      {/* Campaign deletion confirmation dialog */}
+      {showDeleteConfirmation && (
+        <div className="confirmation-overlay">
+          <div
+            className="confirmation-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="campaign-delete-title"
+            aria-describedby="campaign-delete-description"
+          >
+            <h2 id="campaign-delete-title">Delete Campaign?</h2>
+
+            <p id="campaign-delete-description">
+              Are you sure you want to delete this campaign? This action cannot
+              be undone.
+            </p>
+
+            <div className="confirmation-actions">
+              <button
+                type="button"
+                className="confirmation-cancel"
+                onClick={() => setShowDeleteConfirmation(false)}
+                disabled={deletingCampaign}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="confirmation-delete"
+                onClick={handleDeleteCampaign}
+                disabled={deletingCampaign}
+              >
+                {deletingCampaign ? "Deleting..." : "Delete Campaign"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

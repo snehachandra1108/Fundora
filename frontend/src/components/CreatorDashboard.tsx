@@ -2,10 +2,15 @@
 import { useEffect, useState } from "react";
 import type { Campaign } from "../types/campaign";
 import API_URL from "../config/api";
+import { useNotification } from "../context/NotificationContext";
 
 function CreatorDashboard() {
   const [myCampaigns, setMyCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [campaignToDelete, setCampaignToDelete] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     async function fetchMyCampaigns() {
@@ -52,18 +57,16 @@ function CreatorDashboard() {
     0,
   );
 
-  async function handleDeleteCampaign(campaignId: number) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this campaign?",
-    );
-
-    if (!confirmed) {
+  async function handleDeleteCampaign() {
+    if (campaignToDelete === null) {
       return;
     }
 
     try {
+      setIsDeleting(true);
+
       const response = await fetch(
-        `${API_URL}/api/campaigns/${campaignId}`,
+        `${API_URL}/api/campaigns/${campaignToDelete}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -77,14 +80,22 @@ function CreatorDashboard() {
       }
 
       setMyCampaigns((previousCampaigns) =>
-        previousCampaigns.filter((campaign) => campaign.id !== campaignId),
+        previousCampaigns.filter(
+          (campaign) => campaign.id !== campaignToDelete,
+        ),
       );
 
-      alert("Campaign deleted successfully!");
+      setCampaignToDelete(null);
+      showNotification("Campaign deleted successfully!", "success");
     } catch (error) {
       console.error("Campaign deletion error:", error);
 
-      alert(error instanceof Error ? error.message : "Something went wrong.");
+      showNotification(
+        error instanceof Error ? error.message : "Something went wrong.",
+        "error",
+      );
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -146,7 +157,7 @@ function CreatorDashboard() {
 
               <button
                 className="delete-button"
-                onClick={() => handleDeleteCampaign(campaign.id)}
+                onClick={() => setCampaignToDelete(campaign.id)}
               >
                 Delete
               </button>
@@ -154,6 +165,46 @@ function CreatorDashboard() {
           ))
         )}
       </div>
+
+      {/* Delete confirmation dialog */}
+      {campaignToDelete !== null && (
+        <div className="confirmation-overlay">
+          <div
+            className="confirmation-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-dialog-title"
+            aria-describedby="delete-dialog-description"
+          >
+            <h2 id="delete-dialog-title">Delete Campaign?</h2>
+
+            <p id="delete-dialog-description">
+              Are you sure you want to delete this campaign? This action cannot
+              be undone.
+            </p>
+
+            <div className="confirmation-actions">
+              <button
+                type="button"
+                className="confirmation-cancel"
+                onClick={() => setCampaignToDelete(null)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="confirmation-delete"
+                onClick={handleDeleteCampaign}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete Campaign"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
