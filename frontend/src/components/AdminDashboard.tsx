@@ -72,7 +72,9 @@ function AdminDashboard() {
 
         const data = await response.json();
 
-        console.log("Admin stats response:", response.status, data);
+        alert(
+          "Status: " + response.status + "\nResponse: " + JSON.stringify(data),
+        );
 
         setStats(data.stats);
       } catch (error) {
