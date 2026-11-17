@@ -1,5 +1,10 @@
+
 {
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://fundora-backend-2jqd.onrender.com/api/$1"
+    },
     {
       "source": "/(.*)",
       "destination": "/"
