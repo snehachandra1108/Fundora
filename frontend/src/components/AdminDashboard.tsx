@@ -1,3 +1,4 @@
+
 import API_URL from "../config/api";
 import { useEffect, useState } from "react";
 
@@ -12,10 +13,11 @@ interface PendingCampaign {
   creator_email: string;
   status: "pending";
 }
+
 interface AdminStats {
   total_users: number;
   total_campaigns: number;
-  total_funds_raised: string;
+  total_funds_raised: string | number;
 }
 
 interface RecentUser {
@@ -27,11 +29,13 @@ interface RecentUser {
 }
 
 function AdminDashboard() {
-  const [pendingCampaigns, setPendingCampaigns] = useState<PendingCampaign[]>(
-    [],
-  );
+  const [pendingCampaigns, setPendingCampaigns] = useState<PendingCampaign[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState("");
+
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
 
@@ -47,8 +51,7 @@ function AdminDashboard() {
         }
 
         const data = await response.json();
-
-        setPendingCampaigns(data.campaigns);
+        setPendingCampaigns(data.campaigns || []);
       } catch (error) {
         console.error("Error fetching pending campaigns:", error);
       } finally {
@@ -66,24 +69,23 @@ function AdminDashboard() {
           credentials: "include",
         });
 
-        const responseBody = await response.text();
-
         if (!response.ok) {
-          alert(
-            "HTTP Status: " + response.status + "\nResponse: " + responseBody,
-          );
           throw new Error("Failed to fetch platform statistics.");
         }
 
-        const data = JSON.parse(responseBody);
-        alert(
-          "Status: " + response.status + "\nResponse: " + JSON.stringify(data),
-        );
+        const data = await response.json();
+
+        if (!data.stats) {
+          throw new Error("Statistics were not returned by the server.");
+        }
 
         setStats(data.stats);
+        setStatsError("");
       } catch (error) {
         console.error("Error fetching admin statistics:", error);
-        alert("Admin stats error: " + String(error));
+        setStatsError("Unable to load platform statistics.");
+      } finally {
+        setStatsLoading(false);
       }
     }
 
@@ -102,8 +104,7 @@ function AdminDashboard() {
         }
 
         const data = await response.json();
-
-        setRecentUsers(data.users);
+        setRecentUsers(data.users || []);
       } catch (error) {
         console.error("Error fetching recent users:", error);
       } finally {
@@ -137,7 +138,6 @@ function AdminDashboard() {
         throw new Error(data.message || "Failed to update campaign status.");
       }
 
-      // Remove the reviewed campaign from the pending list
       setPendingCampaigns((previousCampaigns) =>
         previousCampaigns.filter((campaign) => campaign.id !== campaignId),
       );
@@ -149,7 +149,6 @@ function AdminDashboard() {
       );
     } catch (error) {
       console.error("Campaign review error:", error);
-
       alert(error instanceof Error ? error.message : "Something went wrong.");
     }
   }
@@ -166,28 +165,38 @@ function AdminDashboard() {
         <div className="dashboard-stat-card">
           <h3>Total Users</h3>
           <p>
-            {stats ? stats.total_users.toLocaleString("en-IN") : "Loading..."}
+            {statsLoading
+              ? "Loading..."
+              : statsError
+                ? "Unavailable"
+                : (stats?.total_users ?? 0).toLocaleString("en-IN")}
           </p>
         </div>
 
         <div className="dashboard-stat-card">
           <h3>Total Campaigns</h3>
           <p>
-            {stats
-              ? stats.total_campaigns.toLocaleString("en-IN")
-              : "Loading..."}
+            {statsLoading
+              ? "Loading..."
+              : statsError
+                ? "Unavailable"
+                : (stats?.total_campaigns ?? 0).toLocaleString("en-IN")}
           </p>
         </div>
 
         <div className="dashboard-stat-card">
           <h3>Total Funds Raised</h3>
           <p>
-            {stats
-              ? `₹${Number(stats.total_funds_raised).toLocaleString("en-IN")}`
-              : "Loading..."}
+            {statsLoading
+              ? "Loading..."
+              : statsError
+                ? "Unavailable"
+                : `₹${Number(stats?.total_funds_raised ?? 0).toLocaleString("en-IN")}`}
           </p>
         </div>
       </div>
+
+      {statsError && <p>{statsError}</p>}
 
       {/* Campaign moderation */}
       <div className="dashboard-campaigns">
@@ -231,9 +240,7 @@ function AdminDashboard() {
         )}
       </div>
 
-      {/* User management */}
-
-      {/* User management */}
+      {/* Recent users */}
       <div className="dashboard-campaigns admin-users">
         <div className="dashboard-campaigns-heading">
           <h2>Recent Users</h2>
