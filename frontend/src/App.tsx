@@ -1,3 +1,4 @@
+
 import API_URL from "./config/api";
 import ProtectedRoute from "./components/ProtectedRoute";
 import type { User } from "./types/user";
@@ -57,6 +58,7 @@ function HomePage({
     </>
   );
 }
+
 function App() {
   const [campaigns, setCampaigns] = useState<Campaign[]>(() => {
     const savedCampaigns = localStorage.getItem("fundora_campaigns");
@@ -72,11 +74,11 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [publicCampaigns, setPublicCampaigns] = useState<Campaign[]>([]);
 
-  // Restore the user's session.
+  // Restore the user's session when the application loads.
   useEffect(() => {
     async function checkSession() {
       try {
-        const response = await fetch("${API_URL}/api/auth/me", {
+        const response = await fetch(`${API_URL}/api/auth/me`, {
           method: "GET",
           credentials: "include",
         });
@@ -102,7 +104,7 @@ function App() {
   // Fetch approved public campaigns.
   const fetchPublicCampaigns = useCallback(async () => {
     try {
-      const response = await fetch("${API_URL}/api/campaigns");
+      const response = await fetch(`${API_URL}/api/campaigns`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch campaigns.");
@@ -172,7 +174,7 @@ function App() {
     >,
   ) {
     try {
-      const response = await fetch("${API_URL}/api/campaigns", {
+      const response = await fetch(`${API_URL}/api/campaigns`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -282,7 +284,7 @@ function App() {
 
   async function handleLogout() {
     try {
-      const response = await fetch("${API_URL}/api/auth/logout", {
+      const response = await fetch(`${API_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
