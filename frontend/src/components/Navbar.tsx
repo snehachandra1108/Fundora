@@ -93,7 +93,7 @@ function Navbar({
       <div className={`navbar-buttons ${isMenuOpen ? "mobile-open" : ""}`}>
         {currentUser ? (
           <>
-            <span>Hi, {currentUser.name}</span>
+            <span className="navbar-greeting">Hi, {currentUser.name}</span>
 
             <Link
               to={dashboardPath}
