@@ -1,5 +1,7 @@
+
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import API_URL from "../config/api";
 
 interface Contribution {
   id: number;
@@ -24,7 +26,7 @@ function SupporterDashboard() {
     async function fetchContributions() {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/contributions/my",
+          `${API_URL}/api/contributions/my`,
           {
             credentials: "include",
           },

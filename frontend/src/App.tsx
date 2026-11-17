@@ -1,3 +1,4 @@
+import API_URL from "./config/api";
 import ProtectedRoute from "./components/ProtectedRoute";
 import type { User } from "./types/user";
 import { useCallback, useEffect, useState } from "react";
@@ -75,7 +76,7 @@ function App() {
   useEffect(() => {
     async function checkSession() {
       try {
-        const response = await fetch("http://localhost:5000/api/auth/me", {
+        const response = await fetch("${API_URL}/api/auth/me", {
           method: "GET",
           credentials: "include",
         });
@@ -101,7 +102,7 @@ function App() {
   // Fetch approved public campaigns.
   const fetchPublicCampaigns = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/campaigns");
+      const response = await fetch("${API_URL}/api/campaigns");
 
       if (!response.ok) {
         throw new Error("Failed to fetch campaigns.");
@@ -171,7 +172,7 @@ function App() {
     >,
   ) {
     try {
-      const response = await fetch("http://localhost:5000/api/campaigns", {
+      const response = await fetch("${API_URL}/api/campaigns", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -214,7 +215,7 @@ function App() {
   async function handleUpdateCampaign(updatedCampaign: Campaign) {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/campaigns/${updatedCampaign.id}`,
+        `${API_URL}/api/campaigns/${updatedCampaign.id}`,
         {
           method: "PUT",
           headers: {
@@ -259,7 +260,7 @@ function App() {
 
   async function handleDeleteCampaign(campaignId: number) {
     const response = await fetch(
-      `http://localhost:5000/api/campaigns/${campaignId}`,
+      `${API_URL}/api/campaigns/${campaignId}`,
       {
         method: "DELETE",
         credentials: "include",
@@ -281,7 +282,7 @@ function App() {
 
   async function handleLogout() {
     try {
-      const response = await fetch("http://localhost:5000/api/auth/logout", {
+      const response = await fetch("${API_URL}/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });

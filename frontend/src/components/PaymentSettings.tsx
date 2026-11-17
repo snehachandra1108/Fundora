@@ -1,5 +1,6 @@
 
 import { useEffect, useRef, useState } from "react";
+import API_URL from "../config/api";
 
 interface PaymentSettingsData {
   upi_id: string;
@@ -20,7 +21,7 @@ function PaymentSettings() {
     async function fetchPaymentSettings() {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/payment-settings",
+          `${API_URL}/api/payment-settings`,
           {
             credentials: "include",
           },
@@ -101,7 +102,7 @@ function PaymentSettings() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/payment-settings",
+        `${API_URL}/api/payment-settings`,
         {
           method: "PUT",
           headers: {

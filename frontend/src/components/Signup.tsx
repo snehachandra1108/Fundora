@@ -2,6 +2,7 @@
 import type { User } from "../types/user";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import API_URL from "../config/api";
 
 function Signup({ onSignup }: { onSignup: (user: User) => void }) {
   const [error, setError] = useState("");
@@ -33,7 +34,7 @@ function Signup({ onSignup }: { onSignup: (user: User) => void }) {
     try {
       setIsSubmitting(true);
 
-      const response = await fetch("http://localhost:5000/api/auth/signup", {
+      const response = await fetch(`${API_URL}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

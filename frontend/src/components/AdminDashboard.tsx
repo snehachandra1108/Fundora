@@ -1,3 +1,5 @@
+
+import API_URL from "../config/api";
 import { useEffect, useState } from "react";
 
 interface PendingCampaign {
@@ -38,7 +40,7 @@ function AdminDashboard() {
     async function fetchPendingCampaigns() {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/campaigns/pending",
+          `${API_URL}/api/campaigns/pending`,
           {
             credentials: "include",
           },
@@ -64,7 +66,7 @@ function AdminDashboard() {
   useEffect(() => {
     async function fetchAdminStats() {
       try {
-        const response = await fetch("http://localhost:5000/api/admin/stats", {
+        const response = await fetch(`${API_URL}/api/admin/stats`, {
           credentials: "include",
         });
 
@@ -86,7 +88,7 @@ function AdminDashboard() {
   useEffect(() => {
     async function fetchRecentUsers() {
       try {
-        const response = await fetch("http://localhost:5000/api/admin/users", {
+        const response = await fetch(`${API_URL}/api/admin/users`, {
           credentials: "include",
         });
 
@@ -113,7 +115,7 @@ function AdminDashboard() {
   ) {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/campaigns/${campaignId}/status`,
+        `${API_URL}/api/campaigns/${campaignId}/status`,
         {
           method: "PATCH",
           headers: {
@@ -250,7 +252,6 @@ function AdminDashboard() {
             </div>
           ))
         )}
-        
       </div>
     </section>
   );

@@ -1,6 +1,8 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Campaign } from "../types/campaign";
+import API_URL from "../config/api";
 
 interface Contribution {
   id: number;
@@ -65,7 +67,7 @@ function Dashboard() {
 
   async function fetchContributions() {
     try {
-      const response = await fetch("http://localhost:5000/api/contributions/my", {
+      const response = await fetch(`${API_URL}/api/contributions/my`, {
         credentials: "include",
         cache: "no-store",
       });
@@ -85,7 +87,7 @@ function Dashboard() {
 
   async function fetchReceivedContributions() {
     try {
-      const response = await fetch("http://localhost:5000/api/contributions/received", {
+      const response = await fetch(`${API_URL}/api/contributions/received`, {
         credentials: "include",
         cache: "no-store",
       });
@@ -105,7 +107,7 @@ function Dashboard() {
 
   async function fetchMyCampaigns() {
     try {
-      const response = await fetch("http://localhost:5000/api/campaigns/my", {
+      const response = await fetch(`${API_URL}/api/campaigns/my`, {
         credentials: "include",
         cache: "no-store",
       });
@@ -235,7 +237,7 @@ function Dashboard() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/contributions/${contributionId}/review`,
+        `${API_URL}/api/contributions/${contributionId}/review`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -277,7 +279,7 @@ function Dashboard() {
     setCampaignActionMessage("");
 
     try {
-      const response = await fetch(`http://localhost:5000/api/campaigns/${campaignId}`, {
+      const response = await fetch(`${API_URL}/api/campaigns/${campaignId}`, {
         method: "DELETE",
         credentials: "include",
       });

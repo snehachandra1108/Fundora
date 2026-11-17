@@ -1,7 +1,9 @@
+
 import type { User } from "../types/user";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import type { Campaign } from "../types/campaign";
+import API_URL from "../config/api";
 
 interface CampaignPaymentDetails {
   upiId: string | null;
@@ -100,7 +102,7 @@ function CampaignDetails({
     async function fetchCampaign() {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/campaigns/${id}`,
+          `${API_URL}/api/campaigns/${id}`,
           {
             credentials: "include",
             cache: "no-store",
@@ -179,7 +181,7 @@ function CampaignDetails({
         }
 
         const response = await fetch(
-          "http://localhost:5000/api/contributions/my",
+          `${API_URL}/api/contributions/my`,
           {
             credentials: "include",
             cache: "no-store",
@@ -295,7 +297,7 @@ function CampaignDetails({
     setContributing(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/contributions", {
+      const response = await fetch(`${API_URL}/api/contributions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -367,7 +369,7 @@ function CampaignDetails({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/contributions/${contributionId}/amount`,
+        `${API_URL}/api/contributions/${contributionId}/amount`,
         {
           method: "PATCH",
           headers: {
@@ -424,7 +426,7 @@ function CampaignDetails({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/contributions/${contributionId}/utr`,
+        `${API_URL}/api/contributions/${contributionId}/utr`,
         {
           method: "POST",
           headers: {

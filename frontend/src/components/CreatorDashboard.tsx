@@ -1,5 +1,7 @@
+
 import { useEffect, useState } from "react";
 import type { Campaign } from "../types/campaign";
+import API_URL from "../config/api";
 
 function CreatorDashboard() {
   const [myCampaigns, setMyCampaigns] = useState<Campaign[]>([]);
@@ -8,7 +10,7 @@ function CreatorDashboard() {
   useEffect(() => {
     async function fetchMyCampaigns() {
       try {
-        const response = await fetch("http://localhost:5000/api/campaigns/my", {
+        const response = await fetch(`${API_URL}/api/campaigns/my`, {
           credentials: "include",
         });
 
@@ -61,7 +63,7 @@ function CreatorDashboard() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/campaigns/${campaignId}`,
+        `${API_URL}/api/campaigns/${campaignId}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -85,6 +87,7 @@ function CreatorDashboard() {
       alert(error instanceof Error ? error.message : "Something went wrong.");
     }
   }
+
   return (
     <section className="dashboard-section">
       <div className="dashboard-heading">
