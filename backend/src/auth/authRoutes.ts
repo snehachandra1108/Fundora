@@ -67,8 +67,9 @@ router.post("/signup", async (req, res) => {
     // 10. Set the session cookie in the browser
     res.cookie("fundora_session", sessionToken, {
       httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
     });
@@ -167,8 +168,9 @@ router.post("/login", async (req, res) => {
     // 8. Send the token through a secure cookie
     res.cookie("fundora_session", sessionToken, {
       httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
     });
@@ -272,8 +274,9 @@ router.post("/logout", async (req, res) => {
     // 5. Clear the browser cookie
     res.clearCookie("fundora_session", {
       httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+
       path: "/",
     });
 
