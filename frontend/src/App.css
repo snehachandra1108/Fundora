@@ -919,6 +919,55 @@
   font-size: 14px;
 }
 
+
+/* Campaign review actions */
+.campaign-review-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.campaign-review-actions button {
+  border: none;
+  border-radius: 6px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.approve-button {
+  background-color: #16a34a;
+  color: #ffffff;
+}
+
+.approve-button:hover {
+  background-color: #15803d;
+  transform: translateY(-1px);
+}
+
+.reject-button {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.reject-button:hover {
+  background-color: #b91c1c;
+  transform: translateY(-1px);
+}
+
+.campaign-review-actions button:focus-visible {
+  outline: 3px solid #64748b;
+  outline-offset: 3px;
+}
+
+.campaign-review-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Admin dashboard and statuses */
 
 .admin-users {
