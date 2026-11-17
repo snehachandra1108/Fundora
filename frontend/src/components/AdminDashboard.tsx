@@ -1,4 +1,3 @@
-
 import API_URL from "../config/api";
 import { useEffect, useState } from "react";
 
@@ -39,12 +38,9 @@ function AdminDashboard() {
   useEffect(() => {
     async function fetchPendingCampaigns() {
       try {
-        const response = await fetch(
-          `${API_URL}/api/campaigns/pending`,
-          {
-            credentials: "include",
-          },
-        );
+        const response = await fetch(`${API_URL}/api/campaigns/pending`, {
+          credentials: "include",
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch pending campaigns.");
@@ -76,9 +72,12 @@ function AdminDashboard() {
 
         const data = await response.json();
 
+        console.log("Admin stats response:", response.status, data);
+
         setStats(data.stats);
       } catch (error) {
         console.error("Error fetching admin statistics:", error);
+        alert("Admin stats error: " + String(error));
       }
     }
 
