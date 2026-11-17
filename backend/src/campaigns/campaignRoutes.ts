@@ -420,12 +420,6 @@ router.put(
         });
       }
 
-      if (campaign.status === "approved") {
-        return res.status(403).json({
-          message: "Approved campaigns cannot be edited directly.",
-        });
-      }
-
       const result = await pool.query(
         `UPDATE campaigns
          SET
@@ -435,6 +429,7 @@ router.put(
            goal = $4,
            deadline = $5,
            image = $6,
+           status = 'pending',
            updated_at = CURRENT_TIMESTAMP
          WHERE id = $7
          RETURNING *`,
@@ -450,7 +445,8 @@ router.put(
       );
 
       return res.json({
-        message: "Campaign updated successfully!",
+        message:
+          "Campaign updated successfully! It is now awaiting admin approval.",
         campaign: result.rows[0],
       });
     } catch (error) {
