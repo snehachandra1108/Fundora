@@ -1,5 +1,5 @@
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useNotification } from "../context/NotificationContext";
 import type { Campaign } from "../types/campaign";
@@ -29,13 +29,26 @@ function CreateCampaign({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
-    title: existingCampaign?.title ?? "",
-    description: existingCampaign?.description ?? "",
-    category: existingCampaign?.category ?? "",
-    goal: existingCampaign?.goal.toString() ?? "",
-    deadline: existingCampaign?.deadline ?? "",
-    image: existingCampaign?.image ?? "",
+    title: "",
+    description: "",
+    category: "",
+    goal: "",
+    deadline: "",
+    image: "",
   });
+
+  useEffect(() => {
+    if (existingCampaign) {
+      setFormData({
+        title: existingCampaign.title,
+        description: existingCampaign.description,
+        category: existingCampaign.category,
+        goal: existingCampaign.goal.toString(),
+        deadline: existingCampaign.deadline.split("T")[0],
+        image: existingCampaign.image ?? "",
+      });
+    }
+  }, [existingCampaign]);
 
   function handleChange(
     event: React.ChangeEvent<
@@ -44,10 +57,10 @@ function CreateCampaign({
   ) {
     const { id, value } = event.target;
 
-    setFormData({
-      ...formData,
+    setFormData((previous) => ({
+      ...previous,
       [id]: value,
-    });
+    }));
   }
 
   function isDeadlineValid(deadline: string) {
@@ -118,8 +131,13 @@ function CreateCampaign({
   return (
     <section className="auth-section">
       <div className="auth-container">
-        <h1>Create a Campaign</h1>
-        <p>Share your cause and start raising funds.</p>
+        <h1>{id ? "Edit Campaign" : "Create a Campaign"}</h1>
+
+        <p>
+          {id
+            ? "Update your campaign details."
+            : "Share your cause and start raising funds."}
+        </p>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -202,7 +220,11 @@ function CreateCampaign({
             />
           </div>
 
-          <button type="submit" className="auth-button" disabled={isSubmitting}>
+          <button
+            type="submit"
+            className="auth-button"
+            disabled={isSubmitting}
+          >
             {isSubmitting && <span className="loading-spinner"></span>}
             {isSubmitting
               ? existingCampaign
