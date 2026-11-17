@@ -12,15 +12,19 @@ function Navbar({
 }) {
   const location = useLocation();
   const [homeLoading, setHomeLoading] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isAdmin = currentUser?.role === "admin";
   const dashboardPath = isAdmin ? "/admin-dashboard" : "/dashboard";
 
   useEffect(() => {
     setHomeLoading(false);
+    setIsMenuOpen(false);
   }, [location.pathname]);
 
   function handleHomeNavigation() {
+    setIsMenuOpen(false);
+
     if (location.pathname === "/") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       setHomeLoading(false);
@@ -30,16 +34,21 @@ function Navbar({
   }
 
   function handleExploreNavigation() {
+    setIsMenuOpen(false);
+
     if (location.pathname === "/") {
       document.getElementById("campaigns")?.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
     } else {
-      // Navigate home first; the campaigns section can then be reached
-      // using the Explore Campaigns link.
       window.location.href = "/#campaigns";
     }
+  }
+
+  function handleLogout() {
+    setIsMenuOpen(false);
+    onLogout();
   }
 
   return (
@@ -54,7 +63,17 @@ function Navbar({
           {homeLoading && <span className="loading-spinner" />}
         </Link>
 
-        <nav className="navbar-links">
+        <button
+          type="button"
+          className="mobile-menu-toggle"
+          onClick={() => setIsMenuOpen((previous) => !previous)}
+          aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={isMenuOpen}
+        >
+          {isMenuOpen ? "✕" : "☰"}
+        </button>
+
+        <nav className={`navbar-links ${isMenuOpen ? "mobile-open" : ""}`}>
           <Link to="/" onClick={handleHomeNavigation}>
             Home
           </Link>
@@ -71,32 +90,48 @@ function Navbar({
         </nav>
       </div>
 
-      <div className="navbar-buttons">
+      <div className={`navbar-buttons ${isMenuOpen ? "mobile-open" : ""}`}>
         {currentUser ? (
           <>
             <span>Hi, {currentUser.name}</span>
 
-            <Link to={dashboardPath} className="login-button">
+            <Link
+              to={dashboardPath}
+              className="login-button"
+              onClick={() => setIsMenuOpen(false)}
+            >
               {isAdmin ? "Admin Dashboard" : "Dashboard"}
             </Link>
 
             {!isAdmin && (
-              <Link to="/payment-settings" className="login-button">
+              <Link
+                to="/payment-settings"
+                className="login-button"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Payment Settings
               </Link>
             )}
 
-            <button onClick={onLogout} className="signup-button">
+            <button onClick={handleLogout} className="signup-button">
               Log Out
             </button>
           </>
         ) : (
           <>
-            <Link to="/login" className="login-button">
+            <Link
+              to="/login"
+              className="login-button"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Log In
             </Link>
 
-            <Link to="/signup" className="signup-button">
+            <Link
+              to="/signup"
+              className="signup-button"
+              onClick={() => setIsMenuOpen(false)}
+            >
               Sign Up
             </Link>
           </>

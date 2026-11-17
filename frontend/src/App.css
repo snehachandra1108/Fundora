@@ -2680,3 +2680,97 @@ button:disabled {
     width: 100%;
   }
 }
+
+
+/* Mobile collapsible navbar */
+
+.mobile-menu-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    min-height: 70px;
+    height: auto;
+    padding: 14px 20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .navbar-left {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0;
+  }
+
+  .mobile-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 8px;
+    background-color: #f3efff;
+    color: #7042c8;
+    font-size: 25px;
+    cursor: pointer;
+  }
+
+  .navbar-links {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding-top: 12px;
+  }
+
+  .navbar-links.mobile-open {
+    display: flex;
+  }
+
+  .navbar-links a {
+    width: 100%;
+    padding: 12px 4px;
+    font-size: 15px;
+  }
+
+  .navbar-buttons {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+    padding-top: 12px;
+  }
+
+  .navbar-buttons.mobile-open {
+    display: flex;
+  }
+
+  .navbar-buttons > span {
+    padding: 8px 4px;
+  }
+
+  .navbar-buttons .login-button,
+  .navbar-buttons .signup-button {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 12px 15px;
+  }
+
+  .navbar-logo {
+    font-size: 23px;
+  }
+}
+
