@@ -2158,9 +2158,7 @@ button:disabled {
     gap: 12px;
   }
 
-  .navbar-links a {
-    font-size: 13px;
-  }
+  
 
   .navbar-buttons {
     justify-content: flex-end;
@@ -2171,9 +2169,7 @@ button:disabled {
     padding: 10px 14px;
   }
 
-  .navbar-buttons .login-button {
-    font-size: 13px;
-  }
+  
 
   .hero-stats {
     gap: 25px;
@@ -2755,11 +2751,15 @@ button:disabled {
   }
 
   .navbar-links a {
+    display: flex;
+    align-items: center;
     width: 100%;
     padding: 12px 4px;
     font-size: 15px;
+    line-height: 1.4;
+    text-align: left;
+    box-sizing: border-box;
   }
-
   .navbar-buttons {
     display: none;
     width: 100%;
@@ -2779,16 +2779,20 @@ button:disabled {
   }
 
   .navbar-buttons .login-button {
-  width: 100%;
-  text-align: left;
-  box-sizing: border-box;
-}
+    display: block;
+    width: 100%;
+    padding: 12px 4px;
+    font-size: 15px;
+    line-height: 1.4;
+    text-align: left;
+    box-sizing: border-box;
+  }
 
-.navbar-buttons .signup-button {
-  width: 100%;
-  text-align: center;
-  box-sizing: border-box;
-}
+  .navbar-buttons .signup-button {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
 }
 
 @media (max-width: 480px) {
